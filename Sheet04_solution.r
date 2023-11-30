@@ -36,24 +36,67 @@
 ## the t.test function.
 
 ## a) Why do you need a one-sample t-test here?
+# We are trying to learn whether our unknown population mean is actually 
+# different from 66 ft; we don't know the standard deviation of the population,
+# and we are testing on ratio scale data. Given the above, the most appropriate
+# test to use is the one-sample t-test.
 
 ## b) Do you need a one-tailed or two-tailed test?
+# So, we want the trees to be visible behind the birch trees, which means the
+# cherries would need to be greater than 66 ft tall. Therefore, one-tailed
+# test will suffice.
 
 ## c) check whether the normality assumption is violated
+# To check for normality, we can build a QQ-plot of the data and/or the density 
+# kernel plot.
+trees_heights <- trees$Height
+
+qqnorm(trees_heights)
+qqline(trees_heights)
+
+density_plot <- density(trees_heights)
+plot(density_plot)
+
+# It seems that the normality assumption is violated, because the density_plot 
+# is has two peaks instead of one, and the points on the QQ-plot don't lie
+# on the straight line.
 
 ## d) calculate the t statistic without using the t.test function
 
+sample_mean <- mean(trees_heights)
+sample_sd <- sd(trees_heights)
+sample_size <- length(trees_heights)
+pop_mean <- 66
+
+t_statistic <- (sample_mean - pop_mean) / (sample_sd / sqrt(sample_size))
+
 ## e) What degrees of freedom do you need?
+
+df <- sample_size - 1
 
 ## f) Find the critical value for your test, using an alpha-level of 0.001 (it's really expensive to
 ## plant those trees, so you want to make sure that the difference is really there)
 
+critical_value <- qt(0.001, df)
+
 ## g) What is your conclusion (in terms of the null hypothesis)?
+# Our null hypothesis is that the mean height of the cherry trees is 66 feet
+# or less (and we want to disprove this). 
+# The absolute t-statistic value is greater than the critical value,
+# therefore, we can reject the null hypothesis.
+
+t_statistic > critical_value
 
 ## h) Now, run the same t test using the t.test function
 
+t.test(trees_heights, mu=66)
+
 ## i) Given your friend wants the trees of her choice to be at least 5 ft higher than the birch trees, 
 ##    will you recommend planting cherry trees?
+
+# If we consider the lowest value from the 95% CI, 73.6 feet,
+# it will still be at least 5 ft more than 66 ft, therefore, yes,
+# we can recommend planting cherry trees.
 
 #####################################################
 ### 2. Restructuring, filtering, plotting, and  t test
