@@ -219,21 +219,50 @@ grid.arrange(ComplexDensityPlot, SimplexDensityPlot, ncol = 2)
 ## l. Based on the histograms and the density plots - are these data likely coming
 ## from a normal distribution?
 
+#### It seems likely that the data is coming from a normal distribution.
+
 ## m. Create boxplots of the mean RT in bySubj by Freq
+
+ggplot(bySubj, aes(x=Complex, y=MeanRT)) +
+  geom_boxplot()
 
 ## n. We will ignore our results from l-m and compute a t-test to compare the mean RT between 
 ##  lexical decisions on complex vs simplex words using the data in bySubj.
 ##  Do you need a paired t-test or independent sample t-test? why?
 
+#### We need a pair t-test because we don't have independent samples. Each
+#### participant's reaction time for complex AND simplex words were recorded, so
+#### consequently, the reaction time data for complex words was not observed
+#### independently of the reaction time data for simplex words.
+
 ## o. Compute the t-test you specified above
+
+ComplexRT <- bySubj %>%
+  filter(Complex=='complex')
+SimplexRT <- bySubj %>% 
+  filter(Complex=='simplex')
+
+t.test(ComplexRT$MeanRT, SimplexRT$MeanRT, paired=TRUE)
 
 ## p. What does the output tell you? What conclusions do you draw?
 
+#### We reject the null hypothesis (that the mean RT for complex words is the 
+#### same as the mean RT for simplex words) because the t statistic exceeds the 
+#### the critical t-value.
+
 ## q. Compute the effect size using Cohen's D. 
+
+cohensD(ComplexRT$MeanRT, SimplexRT$MeanRT, method='paired')
 
 ## r.  Which effect size do we get? How do you interpret this result?
 
+#### The effect size is a moderate and indicates that word complexity has a 
+#### moderate effect on response time.
+
 ## s. Why would you report the effect size in addition to the p-value?
+
+#### We care not only about significance, but also effect size. A significant 
+#### result might not be an important result if the effect size is miniscule.
 
 #####################################################
 ### 3. Another T-test
