@@ -57,9 +57,14 @@ qqline(trees_heights)
 density_plot <- density(trees_heights)
 plot(density_plot)
 
-# It seems that the normality assumption is violated, because the density_plot 
-# is has two peaks instead of one, and the points on the QQ-plot don't lie
-# on the straight line.
+# Or also can do this using Shapiro-Wilk test:
+shapiro.test(trees_heights) 
+
+# Given the p-value of 0.4 and W value of ~0.97, we can assume that the data is 
+# normally distributed.
+
+# It seems that the normality assumption is not violated, and given the small
+# sample size, the distribution of the points looks normal.
 
 ## d) calculate the t statistic without using the t.test function
 
@@ -272,12 +277,27 @@ cohensD(ComplexRT$MeanRT, SimplexRT$MeanRT, method='paired')
 ## a. Now let's look at another question, namely whether the native language of the participant 
 ##  influences their reaction time. Check out the variable NativeLanguage. Can you use a t-test to pursue this 
 ##  question and which type of t-test would you use? 
+unique(lex$NativeLanguage)
+
+# Given that we want to compare the sample means from two independent groups 
+# (language is independent in this case) which we don't know the variance of, 
+# we can use the Welch t-test for it.
 
 ## b. Use again group_by and summarize to obtain by subject means of RT, but
 ## this time with regard to NativeLanguage and assign it to bySubjLang
 ## Perform the t-test you decided for.
 
+bySubjLang <- lex %>% 
+  group_by(NativeLanguage, Complex) %>%
+  summarise(MeanRT = mean(RT), .groups = 'keep')
+
+t.test(MeanRT ~ NativeLanguage, data=bySubjLang, var.equal=FALSE, na.rm=TRUE)
+
 ## c. What do you conclude?
+
+# We cannot reject the Null hypothesis, since the p-value is more than 0.05
+# Therefore, there is no significant difference in means between the 
+# language groups
 
 ## d. Choose an appropriate plot to visualize the result
 
