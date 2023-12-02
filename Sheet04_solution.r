@@ -220,21 +220,43 @@ se = function(x){sd(x)/sqrt(length(x))}
 set.seed(9273)
 ## a. Generate 10 samples from a normal distribution with mean 20 and sd 8 and save it in a variable 
 ##  called "tutor1_grades"
-
+tutor1_grades <- rnorm(n = 10, mean = 20, sd = 8)
 ## b. Now we generate our second sample of size 10, this time for tutor 2 and with mean 28 and 
 ## sd 10
+tutor2_grades <- rnorm(n = 10, mean = 28, sd = 10)
 
 ## c. Combine the two samples and store the result into one vector called "score" (it should 
 ##    first show all scores from tutor1 followed by the scores of tutor2)
-
+score <- c(tutor1_grades, tutor2_grades)
 ## d. Create a vector called tutor indicating which tutor the score belongs to: it should show 
 ##   "tutor1" 10 times followed by "tutor2" 10 times
+tutor <- rep(c("tutor1", "tutor2"), each = 10)
 
 ## e. Create a data frame named "data_frame" having 2 columns "tutor", "score" created above.
-
+data_frame <- data.frame(tutor = tutor, score = score)
+print(data_frame)
 ## f. run the independent samples TTest (independentSamplesTTest) and formulate the findings as discussed 
 ###  in the lecture. 
+independent <- independentSamplesTTest(formula = score ~ tutor, data = data_frame)
+independent
 
+# Descriptive statistics: 
+#   tutor1 tutor2
+# mean     20.329 27.410
+# std dev.  6.327  9.263
+
+# Hypotheses: 
+#  null:        population means equal for both groups
+# alternative: different population means in each group
+
+# Test results: 
+#   t-statistic:  -1.996 
+# degrees of freedom:  15.897 
+# p-value:  0.063 
+
+# Other information: 
+#   two-sided 95% confidence interval:  [-14.605, 0.442] 
+# estimated effect size (Cohen's d):  0.893 
 ## Time to play around!
 
 ## g. Repeat the whole experiment you performed above with different sample size 
@@ -242,8 +264,52 @@ set.seed(9273)
 ##  for the t test to be significant when keeping mean and sd constant?
 ## make sure to set the seed again before you run your code to be able to reproduce results
 
+set.seed(1337)
+tutor1_grades <- rnorm(n = 5000, mean = 20, sd = 8)
+tutor2_grades <- rnorm(n = 5000, mean = 28, sd = 10)
+score <- c(tutor1_grades, tutor2_grades)
+tutor <- rep(c("tutor1", "tutor2"), each = 5000)
+data_frame <- data.frame(tutor = tutor, score = score)
+independent_mod_sample <- independentSamplesTTest(formula = score ~ tutor, data = data_frame)
+independent_mod_sample
+
+# n = 100 : [mean = (18.181, 29.610), t-statistic:  -9.134, p-value:  <.001]
+# n = 500 : [mean = (20.463 28.244), t-statistic:  -13.276 , p-value:  <.001]
+# n = 1000 : [mean = (19.771 27.558), t-statistic:  -19.287, p-value:  <.001]
+# n = 2500 : [mean = (20.024 28.285), t-statistic:  -32.123 , p-value:  <.001]
+# n = 5000 : [mean = (20.003 28.170), t-statistic:  -45.604 , p-value:  <.001]
+
+# from above, we see that the mean grades dont really change for sample sizes (100, 500, 1000, 2500, 5000).
+# Hence, we reject the null hypothesis
+
 ## h.	repeat the whole experiment you performed in a-f with different means.
 ##   What do you find? When is the test more likely to come out significant?
 
+set.seed(13376)
+
+tutor1_grades <- rnorm(n = 20, mean = 10, sd = 8)
+tutor2_grades <- rnorm(n = 20, mean = 210, sd = 10)
+score <- c(tutor1_grades, tutor2_grades)
+tutor <- rep(c("tutor1", "tutor2"), each = 20)
+data_frame <- data.frame(tutor = tutor, score = score)
+independent_mod_mean <- independentSamplesTTest(formula = score ~ tutor, data = data_frame)
+independent_mod_mean
+
+# As the difference in means increases, the value of p gets smaller
+# than 0.05, and this is when the test is going to come out significant. 
+
 ## i.	Now, vary the standard deviation, keeping means and sample size constant!
 ##   What do you find? When is the test more likely to come out significant?
+
+set.seed(13379)
+
+tutor1_grades <- rnorm(n = 20, mean = 20, sd = 5)
+tutor2_grades <- rnorm(n = 20, mean = 28, sd = 111)
+score <- c(tutor1_grades, tutor2_grades)
+tutor <- rep(c("tutor1", "tutor2"), each = 20)
+data_frame <- data.frame(tutor = tutor, score = score)
+independent_mod_sample <- independentSamplesTTest(formula = score ~ tutor, data = data_frame)
+independent_mod_sample
+
+# As the sd increases, the CI also increases and is more likely to 
+# overlap with the other confidence interval. Also, the value of p is larger.
