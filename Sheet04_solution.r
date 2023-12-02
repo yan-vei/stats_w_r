@@ -57,9 +57,14 @@ qqline(trees_heights)
 density_plot <- density(trees_heights)
 plot(density_plot)
 
-# It seems that the normality assumption is violated, because the density_plot 
-# is has two peaks instead of one, and the points on the QQ-plot don't lie
-# on the straight line.
+# Or also can do this using Shapiro-Wilk test:
+shapiro.test(trees_heights) 
+
+# Given the p-value of 0.4 and W value of ~0.97, we can assume that the data is 
+# normally distributed.
+
+# It seems that the normality assumption is not violated, and given the small
+# sample size, the distribution of the points looks normal.
 
 ## d) calculate the t statistic without using the t.test function
 
@@ -124,9 +129,12 @@ library(languageR)
 
 ## a. Create the dataset lex, which is a copy of lexdec, but only includes the columns 
 ##  indicated above
+lex <- select(lexdec, Subject, Complex, RT, Sex, NativeLanguage, Correct)
 
 ## b. as we are only interested in the response time for correct responses, filter out 
 ##  any incorrect responses
+lex <- lex %>% 
+  filter(Correct == 'correct')
 
 ## Say you are interested in the influence of the complexity of a word on lexical decision time.
 ## Before we start testing, we want to get an impression of the data and create a barplot of 
@@ -141,18 +149,36 @@ se = function(x){sd(x)/sqrt(length(x))}
 ##  You will find examples of how the summarizing can be done here:
 ##  https://datacarpentry.org/R-genomics/04-dplyr.html#split-apply-combine_data_analysis_and_the_summarize()_function
 
+summaryByComplex <- lex %>%
+  group_by(Complex) %>%
+  summarise(Mean_RT = mean(RT), StandardError = se(RT))
+
 ## d. Describe the resulting data set (summaryByComplex) in your own words
+
+#### For complex words, the mean response time is 6.42, and the standard error is 
+#### 0.181. For simplex words, the mean response time is 6.38, and the standard
+#### error is 0.00616.
 
 ## e. Now use summaryByComplex to create the barplot with error bars denoting the 95% CI
 ##  (i.e. mean +/-1.96 * se)
+
+ggplot(summaryByComplex, aes(x=Complex, y=Mean_RT)) +
+  geom_bar(stat='identity',fill='cyan',width=0.5) +
+  geom_errorbar(aes(x=Complex,ymin=Mean_RT - 1.96 * StandardError, ymax=Mean_RT + 1.96 * StandardError), colour='orangered',width=0.25)
 
 ## f. The barplot always starts at zero, which makes the portion of the graph, we are most 
 ##  interested in (i.e. the spread of the error bars) hard to perceive. As an alternative,
 ##  construct a line plot of the same data, again including error bars.
 ##  Hint: if you get a complaint, try to add group = 1 to your aes
 
+ggplot(summaryByComplex, aes(x=Complex, y=Mean_RT,group=1)) +
+  geom_line() +
+  geom_errorbar(aes(x=Complex,ymin=Mean_RT - 1.96 * StandardError, ymax=Mean_RT + 1.96 * StandardError), colour='orangered',width=0.25)
+
 ## g. Gauging from the plot, does it look like there's an important difference in mean RT 
-##  for complex and simplex words?
+##  for complex and simplex words?]
+
+#### Yes, it does look like there is an import difference in mean RT. The mean Rt for complex words is significantly higher.
 
 ## h. Let's go back to the original data frame "lex".
 ##  Now that you've taken a look at the data, you want to get into the stats.
@@ -160,34 +186,88 @@ se = function(x){sd(x)/sqrt(length(x))}
 ##  Why can't you compute a t-test on the data as they are now? 
 ##  Hint: Which assumption is violated?
 
+#### The observations are not independent. 
+
 ## i. We need to restructure the data to only one observation (average RT) per subject 
 ##  and complex/simplex (Complex). We will again use group_by and summarize, but
 ##  this time we have to group by Subject and Complex, while we only need the mean to be 
 ##  stored, not the se. Assign the result to bySubj
 
+bySubj <- lex %>% 
+  group_by(Subject, Complex) %>%
+  summarise(MeanRT = mean(RT), .groups = 'keep')
+
 ## j. Create histograms of the RT data in bySubj depending on the frequency category 
 ##  and display them side by side. Set the binwidth to 0.08
 
+install.packages('gridExtra')
+library('gridExtra')
+
+ComplexPlot <- ggplot(bySubj %>% filter(Complex=='complex'), aes(x=MeanRT)) +
+  geom_histogram(binwidth=0.08)
+
+SimplexPlot <- ggplot(bySubj %>% filter(Complex=='simplex'), aes(x=MeanRT)) +
+  geom_histogram(binwidth=0.08)
+
+grid.arrange(ComplexPlot, SimplexPlot, ncol = 2)
+
 ## k. Display the same data in density plots. 
+
+ComplexDensityPlot <- ggplot(bySubj %>% filter(Complex=='complex'), aes(x=MeanRT)) +
+  geom_density()
+
+SimplexDensityPlot <- ggplot(bySubj %>% filter(Complex=='simplex'), aes(x=MeanRT)) +
+  geom_density()
+
+grid.arrange(ComplexDensityPlot, SimplexDensityPlot, ncol = 2) 
 
 ## l. Based on the histograms and the density plots - are these data likely coming
 ## from a normal distribution?
 
+#### It seems likely that the data is coming from a normal distribution.
+
 ## m. Create boxplots of the mean RT in bySubj by Freq
+
+ggplot(bySubj, aes(x=Complex, y=MeanRT)) +
+  geom_boxplot()
 
 ## n. We will ignore our results from l-m and compute a t-test to compare the mean RT between 
 ##  lexical decisions on complex vs simplex words using the data in bySubj.
 ##  Do you need a paired t-test or independent sample t-test? why?
 
+#### We need a pair t-test because we don't have independent samples. Each
+#### participant's reaction time for complex AND simplex words were recorded, so
+#### consequently, the reaction time data for complex words was not observed
+#### independently of the reaction time data for simplex words.
+
 ## o. Compute the t-test you specified above
+
+ComplexRT <- bySubj %>%
+  filter(Complex=='complex')
+SimplexRT <- bySubj %>% 
+  filter(Complex=='simplex')
+
+t.test(ComplexRT$MeanRT, SimplexRT$MeanRT, paired=TRUE)
 
 ## p. What does the output tell you? What conclusions do you draw?
 
+#### We reject the null hypothesis (that the mean RT for complex words is the 
+#### same as the mean RT for simplex words) because the t statistic exceeds the 
+#### the critical t-value.
+
 ## q. Compute the effect size using Cohen's D. 
+
+cohensD(ComplexRT$MeanRT, SimplexRT$MeanRT, method='paired')
 
 ## r.  Which effect size do we get? How do you interpret this result?
 
+#### The effect size is a moderate and indicates that word complexity has a 
+#### moderate effect on response time.
+
 ## s. Why would you report the effect size in addition to the p-value?
+
+#### We care not only about significance, but also effect size. A significant 
+#### result might not be an important result if the effect size is miniscule.
 
 #####################################################
 ### 3. Another T-test
@@ -197,12 +277,27 @@ se = function(x){sd(x)/sqrt(length(x))}
 ## a. Now let's look at another question, namely whether the native language of the participant 
 ##  influences their reaction time. Check out the variable NativeLanguage. Can you use a t-test to pursue this 
 ##  question and which type of t-test would you use? 
+unique(lex$NativeLanguage)
+
+# Given that we want to compare the sample means from two independent groups 
+# (language is independent in this case) which we don't know the variance of, 
+# we can use the Welch t-test for it.
 
 ## b. Use again group_by and summarize to obtain by subject means of RT, but
 ## this time with regard to NativeLanguage and assign it to bySubjLang
 ## Perform the t-test you decided for.
 
+bySubjLang <- lex %>% 
+  group_by(NativeLanguage, Complex) %>%
+  summarise(MeanRT = mean(RT), .groups = 'keep')
+
+t.test(MeanRT ~ NativeLanguage, data=bySubjLang, var.equal=FALSE, na.rm=TRUE)
+
 ## c. What do you conclude?
+
+# We cannot reject the Null hypothesis, since the p-value is more than 0.05
+# Therefore, there is no significant difference in means between the 
+# language groups
 
 ## d. Choose an appropriate plot to visualize the result
 
