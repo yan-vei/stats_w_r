@@ -301,6 +301,8 @@ t.test(MeanRT ~ NativeLanguage, data=bySubjLang, var.equal=FALSE, na.rm=TRUE)
 
 ## d. Choose an appropriate plot to visualize the result
 
+ggplot(bySubjLang, aes(x=NativeLanguage, y=MeanRT)) +
+  geom_boxplot()
 
 #############################################
 ### 4. T-Tests for different sample sizes
