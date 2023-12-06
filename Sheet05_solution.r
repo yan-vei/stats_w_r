@@ -10,12 +10,12 @@
 ## Submit your homework via cms
 
 ## Please write below your (and your teammates) name, matriculation number. 
-## Name: 
-## Matriculation number: 
-## Name: 
-## Matriculation number: 
-## Name: 
-## Matriculation number: 
+## Name: Yana Veitsman
+## Matriculation number: 7054842
+## Name: Anthony Dsouza
+## Matriculation number: 7053485
+## Name: Tyler Lee
+## Matriculation number: 7054832
 
 ###########################################################################################
 
@@ -62,7 +62,7 @@ ggplot(data, aes(x=Treat,y=Postwt)) +
 ##  3 treatment groups?
 
 #### Yes, in comparison to the control group, the mean post-treatment weight is
-#### modesty higher for those who underwent CTB and much higher for those who
+#### modestly higher for those who underwent CTB and much higher for those who
 #### underwent FT.
 
 ## e) Now we are ready to perform 1-way ANOVA: please use the function aov() on 
@@ -84,8 +84,6 @@ summary(aov1way)
 ## "bonferroni" as the method of p-value adjustment.
 
 pairwise.t.test(data$Postwt, data$Treat, p.adjust.method = 'bonferroni') 
-# Presumably, 'paired.t.test' in the instructions was a typo, because 
-# ??paired.t.test in the console yields no results.
 
 ## i) Bonferroni is known to be a conservative method: it preserves the nominal alpha level,
 ##  but lacks power to detect effects. An alternative is the "holm" method, which also
@@ -110,8 +108,14 @@ pairwise.t.test(data$Postwt, data$Treat, p.adjust.method = 'holm')
 ## similar between groups.
 
 ## a) Create a graph to see whether prewt is similar between Treat groups.
+ggplot(data, aes(x=Treat,y=Prewt)) +
+  geom_boxplot()
 
 ## b) What is your conclusion?
+
+#### Given the control group, the mean pre-treatment weight is
+#### only slightly more that in the groups that later received CBT and FT,
+### so the difference is negligible. 
 
 ## Next, we will transform the data set, such that we have one variable combining
 ## both Prewt and Postwt values and an additional factor coding for Time. This will allow us
@@ -127,21 +131,47 @@ summary(data_long)
 ## values for data_long. Build 3 plots (each containing 2 boxplots) side by side depending on the 
 ## `Treat` variable.
 
+ggplot(data_long, aes(x=Time,y=Weight, fill=Treat)) +
+  geom_boxplot()
+
 ## d) Describe the pattern you observe in c)
+
+### The mean of the weight is not significantly different between the three groups
+### in the first boxplot that plots the pre-treatment weight.
+### However, the mean weight in the case of the post-treatment measurements
+### is significantly more in the case of the group that received FT, the CBT
+### group's weight increase is not significant, and the control group's weight
+### hasn't changed.
 
 ## e) build a two-way ANOVA including Time and Treat as predictors and their interaction
 ##  and assign it to aov2way.
 
+aov2way <- aov(formula=Weight ~ Time * Treat, data = data_long)
+summary(aov2way)
+
 ## f) Report your results in line with the research question.
+
+#### The F-value for Time:Treat is 3.828 and the p-value is 0.024097. this indicates that with 
+#### an alpha level of 0.05, we can reject the null hypothesis because at least
+#### one of the groups has a significantly different mean from the others.
 
 ## g) In order to evaluate the interaction, we will use pairwise tests again. The
 ## function, we are going to use here is TukeyHSD. Please call the function on the 
 ##  two-way anova
 
+tukey_hsd <- TukeyHSD(aov2way, "Time:Treat")
+
 ## h) The interaction between Time and Treat produces 15 (!) different comparisons,
 ##  but not all of them are meaningful to us. Please select three comparisons to report, 
 ##  which conceptually make most sense! Explain your choice!
 
+### Conceptually, the combinations of Prewt/Postwt:TreamentOption-Cont with the
+### biggest difference in mean would make the most sense to report on given
+### the null hypothesis.
+
+top_diffs <- as.data.frame(tukey_hsd$`Time:Treat`[, c("diff", "lwr", "upr", "p adj")])
+top_diffs <- top_diffs[order(top_diffs$diff, decreasing = TRUE), ][1:3, ]
+top_diffs
 
 #################################################
 ### Exercise 3: independence assumption
@@ -150,6 +180,14 @@ summary(data_long)
 ## The two-way ANOVA above violates the independence assumption.
 ##  a) Explain why.
 
+### The two-way ANOVA from above violates the independence assumption because 
+### we are measuring the differences in weights over time, so it is likely
+### that there will be correlations between the pre-treatment and post-treatment
+### weights within each one of the treatment options groups.So there is interaction
+### between the factors.
+
 ##  b) Can you think of a way to conduct an ANOVA on this dataset without violating
 ##  the independence assumption, but taking into account differences between groups 
 ##  prior to treatment?
+
+### We can include the interaction factor into account and conduct the test that way.
