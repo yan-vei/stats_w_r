@@ -93,10 +93,18 @@ pairwise.t.test(data$Postwt, data$Treat, p.adjust.method = 'holm')
 
 ## j) State your conclusions.
 
-#### Using Bonferroni, we find that only the difference between the control 
-#### group and FT are significant (with alpha = 0.05). Using Holm, we find that
-#### the differences between all pairs (i.e. between CBT and control, between
-#### CBT and FT and between Cont and FT) are all significant (with alpha = 0.05).
+#### Using Bonferroni, the p-value between the control group and FT is 0.0003
+#### (significant), which indicates that FT is associated with a different 
+#### post-treatment weight. The p-value between CBT and the control group is 
+#### 0.0680 (not significant) and the p-value between CBT and FT is 0.1040, 
+#### (not significant), which indicates CBT is not associated with a different 
+#### post-treatment weight in comparison to the control group or FT.
+
+#### Using Holm, the p-value between the control group and FT is 0.0003
+#### (significant), the p-value between CBT and the control group is 
+#### 0.0453 (significant) and the p-value between CBT and FT is 0.0453, 
+#### (significant), all of which indicates the difference between any two of  
+#### the three groups is associated with different post-treatment weight.
 
 ##################################
 ### Exercise 2: 2-way ANOVA
