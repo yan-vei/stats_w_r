@@ -76,9 +76,9 @@ summary(aov1way)
 
 ## g) State your conclusion
 
-#### The F-value is 8.651 and the p-value is 0.000444. this indicates that with 
-#### an alpha level of 0.05, we can reject the null hypothesis because at least
-#### one of the groups has a significantly different mean from the others.
+#### The F-value is 8.651 and the p-value is 0.000444 (significant), which 
+#### indicates that treatment is associated with different post-treatment 
+#### weights.
 
 ## h) Use paired.t.test in order to test which levels of Treat are actually different. Use
 ## "bonferroni" as the method of p-value adjustment.
