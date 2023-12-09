@@ -123,7 +123,7 @@ ggplot(data, aes(x=Treat,y=Prewt)) +
 
 #### Given the control group, the mean pre-treatment weight is
 #### only slightly more that in the groups that later received CBT and FT,
-### so the difference is negligible. 
+#### so the difference is negligible. 
 
 ## Next, we will transform the data set, such that we have one variable combining
 ## both Prewt and Postwt values and an additional factor coding for Time. This will allow us
