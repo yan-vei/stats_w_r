@@ -34,24 +34,49 @@ library(carData)
 ## b) create the dataset AsiaMale, containing the variables educationMale lifeMale GDPperCapita 
 ##    economicActivityMale and illiteracyMale and the subset of Asian countries.
 
+
+AsiaMale <- filter(UN98, region == 'Asia') %>% 
+  select(educationMale, lifeMale, GDPperCapita, economicActivityMale, 
+         illiteracyMale)
+
 ## c) Let's say you're interested in whether there is a linear relationship between 
 ## illiteracy percentage and life expectancy of males in the different countries. 
 ## Take a look at the relationship between the two variables by 
 ## means of a scatterplot (use the ggplot library for this).
 
+ggplot(AsiaMale, aes(x=illiteracyMale, y=lifeMale)) +
+  geom_point()
+
 ## d) Judging from the graph, do you think that the two variables are 
 ## in any way correlated with one another?
+
+#### Based on the graph, it appears there is a correlation.
 
 ## e) Get the correlations between all variables in the data set using cor().
 ## Tell R to only include complete pairs of observations. 
 
+cor(AsiaMale, use='pairwise.complete.obs')
+
 ## f) Concentrate on the row for the life expectancy in males. Interpret the five numbers you see there
 ##   explaining for each number which direction the correlation takes and how strong it is.
 
+#### Male life expectancy has a moderate positive correlation with male 
+#### education with a coefficient of 0.4992759, a strong positive correlation  
+#### with GDP per capita,  with a coefficient of 0.61712008, a very weak
+#### negative correlation with male economic activity and a moderate negative
+#### correlation with male illiteracy.
+
 ## g) Is the correlation between life expectancy and GDPperCapita significant? Use cor.test()
+
+cor.test(AsiaMale$lifeMale, AsiaMale$GDPperCapita)
+
+#### Yes, the correlation is significant (alpha = 0.95) because the p-value is 
+#### 4.93e-06
 
 ## h) Calculate the Spearman rank correlation between life expectancy and GDPperCapita and compare
 ## it to the pearson correlation calculated above.
+
+
 
 ## i) make a scatterplot of this relationship.
 
