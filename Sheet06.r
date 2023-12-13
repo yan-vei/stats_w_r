@@ -76,16 +76,19 @@ cor.test(AsiaMale$lifeMale, AsiaMale$GDPperCapita)
 ## h) Calculate the Spearman rank correlation between life expectancy and GDPperCapita and compare
 ## it to the pearson correlation calculated above.
 
-
+cor.test(AsiaMale$lifeMale, AsiaMale$GDPperCapita, method='spearman') #how exactly should we compare the correlation???
 
 ## i) make a scatterplot of this relationship.
 
 ## j) Looking at the graph, why do you think Spearman's rho is better suited than the Pearson 
 ## correlation to describe the relationship between the two variables?
 
+
 ## k) Using the function paired.r from the package psych, compare the correlations between life expectancy 
 ##  and economic activity on the one hand, and life expectancy and illiteracy on the other hand.
 ##  Hint: the degrees of freedom in a correlation test are equal to N-2
+
+library(psych)
 
 ## l) What do you conclude from k?
 
@@ -105,6 +108,8 @@ AsiaMale$GDPt = AsiaMale$GDPperCapita/1000
 ## "modelname <- lm(outcome ~ predictor, data = dataFrame, na.action = an action)"
 ## "summary(modelname)"
 
+firstModel <- lm(AsiaMale$lifeMale ~ AsiaMale$GDPt, AsiaMale) 
+
 ## b) Interpret the model from a. What do intercept and the coefficient of GDPt tell you?
 
 ## c) What about the model fit: What proportion of the total variance is explained by your model?
@@ -112,8 +117,14 @@ AsiaMale$GDPt = AsiaMale$GDPperCapita/1000
 ## d) Now let's turn to the relationship between life expectancy and illiteracy.  Run the regression and 
 # interpret.
 
+secondModel <- lm(AsiaMale$lifeMale ~ AsiaMale$illiteracyMale, AsiaMale) 
+
 ## e) Plot lifeMale by illiteracyMale and add a regression line to your plot
 
+ggplot(AsiaMale, aes(x=illiteracyMale, y=lifeMale)) +
+  geom_point() +
+  geom_abline(slope=secondModel$coefficients[['AsiaMale$illiteracyMale']], 
+              intercept=secondModel$coefficients[['(Intercept)']]) #issue: missing values
 
 ###################################
 ### Exercise 3: Multiple Regression
