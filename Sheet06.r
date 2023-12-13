@@ -83,6 +83,9 @@ cor.test(AsiaMale$lifeMale, AsiaMale$GDPperCapita, method='spearman') #ask about
 
 ## i) make a scatterplot of this relationship.
 
+ggplot(AsiaMale, aes(x=lifeMale, y=GDPperCapita) +
+         geom_point()
+
 ## j) Looking at the graph, why do you think Spearman's rho is better suited than the Pearson 
 ## correlation to describe the relationship between the two variables?
 
