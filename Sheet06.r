@@ -132,7 +132,24 @@ firstModel <- lm(AsiaMale$lifeMale ~ AsiaMale$GDPt, AsiaMale)
 
 ## b) Interpret the model from a. What do intercept and the coefficient of GDPt tell you?
 
+#### The intercept indicates that the male life expectancy for 
+#### a GDP per capita of 0 dollars is expected to be 62.653 years. The 
+#### coefficient tells you that male life expectancy is expected to increase 
+#### by 0.499 years per every increase of 1000 dollars in GDP per capita.
+
 ## c) What about the model fit: What proportion of the total variance is explained by your model?
+
+slope <- firstModel$coefficients[['AsiaMale$GDPt']]
+intercept <- firstModel$coefficients[['(Intercept)']]
+
+predictedLife <- slope * AsiaMale$GDPt + intercept
+
+SS.resid <- sum( (AsiaMale$lifeMale - predictedLife)^2, na.rm=TRUE)
+SS.tot <- sum( (AsiaMale$lifeMale - mean(AsiaMale$lifeMale))^2)
+Rsquared <- 1 - (SS.resid / SS.tot)
+
+#### GDP per capita (in thousands of dollars) explains 48.74507% of the 
+#### variance in male life expectancy.
 
 ## d) Now let's turn to the relationship between life expectancy and illiteracy.  Run the regression and 
 # interpret.
