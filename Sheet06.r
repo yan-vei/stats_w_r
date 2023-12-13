@@ -89,6 +89,8 @@ ggplot(AsiaMale, aes(x=lifeMale, y=GDPperCapita) +
 ## j) Looking at the graph, why do you think Spearman's rho is better suited than the Pearson 
 ## correlation to describe the relationship between the two variables?
 
+#### Spearman's rho is better suited than the Pearson correlation because
+#### the relationship between the two variables is not strictly linear.
 
 ## k) Using the function paired.r from the package psych, compare the correlations between life expectancy 
 ##  and economic activity on the one hand, and life expectancy and illiteracy on the other hand.
