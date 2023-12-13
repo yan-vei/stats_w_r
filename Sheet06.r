@@ -76,7 +76,10 @@ cor.test(AsiaMale$lifeMale, AsiaMale$GDPperCapita)
 ## h) Calculate the Spearman rank correlation between life expectancy and GDPperCapita and compare
 ## it to the pearson correlation calculated above.
 
-cor.test(AsiaMale$lifeMale, AsiaMale$GDPperCapita, method='spearman') #how exactly should we compare the correlation???
+cor.test(AsiaMale$lifeMale, AsiaMale$GDPperCapita, method='spearman') #ask about at tutorial
+
+#### The correlation given by Spearman rank correlation is slightly higher 
+#### (0.676135 vs. 0.6171201) than the pearson correlation.
 
 ## i) make a scatterplot of this relationship.
 
