@@ -83,24 +83,36 @@ cor.test(AsiaMale$lifeMale, AsiaMale$GDPperCapita, method='spearman') #ask about
 
 ## i) make a scatterplot of this relationship.
 
-ggplot(AsiaMale, aes(x=lifeMale, y=GDPperCapita) +
+ggplot(AsiaMale, aes(x=lifeMale, y=GDPperCapita)) +
          geom_point()
 
 ## j) Looking at the graph, why do you think Spearman's rho is better suited than the Pearson 
 ## correlation to describe the relationship between the two variables?
 
 #### Spearman's rho is better suited than the Pearson correlation because
-#### the relationship between the two variables is not strictly linear.
+#### the relationship between the two variables is not linear.
 
 ## k) Using the function paired.r from the package psych, compare the correlations between life expectancy 
 ##  and economic activity on the one hand, and life expectancy and illiteracy on the other hand.
 ##  Hint: the degrees of freedom in a correlation test are equal to N-2
 
 library(psych)
+econ_life <- cor.test(AsiaMale$lifeMale, AsiaMale$GDPperCapita, 
+                      method='spearman')
+illit_life <- cor.test(AsiaMale$lifeMale, AsiaMale$illiteracyMale, 
+                       method='spearman')
+
+paired.r(econ_life$estimate, illit_life$estimate, n=48)
 
 ## l) What do you conclude from k?
 
+#### Based on the z-value of 5.62, it seems that the correlations
+#### are different; one correlation is negative, the other positive.
+
 ## m) What would be the result, if the two variables would be independent?
+
+#### If the two variables are independent, the function returns the value of a 
+#### simple t-test.
 
 ################################
 ### Exercise 2: Regression
