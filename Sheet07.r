@@ -100,7 +100,8 @@ ggplot(data, aes(x=yrs.service, y=salary, color=discipline)) +
 ## h) Run a regression model that includes also the interaction between 'years in service' and discipline and store it
 ##  as lm3
 
-lm3 <- lm(formula = salary ~ yrs.service:discipline, data=data)
+lm3 <- lm(formula = salary ~ yrs.service + discipline + 
+            yrs.service * discipline + 0, data=data)
 
 ## i) Plot the results of the model! (This time no need to specify the pred data set)
 
@@ -133,7 +134,14 @@ ggplot(data, aes(x=yrs.service, y=salary, color=discipline)) +
 ## a) run a lm model on the same data set, but this time, using the predictors discipline and yrs since phd 
 ##  and their interaction and assign the result to lm4
 
+lm4 <- lm(formula = salary ~ yrs.since.phd + discipline + 
+            yrs.since.phd * discipline + 0, data=data)
+
 ## b) look at the model summary. Which effects are significant?
+
+#### The effect of years since phd and discipline on salary are significant with
+#### alpha = 0.05; however, the effect of the interaction between years since phd 
+#### and discipline on salary is not significant.
 
 ## c) How do you check for influential data points (aka bad outliers)?
 
