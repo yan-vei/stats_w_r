@@ -123,9 +123,20 @@ ggplot(data, aes(x=yrs.service, y=salary, color=discipline)) +
 ## k) To do model checking on your model lm3, i.e. inspect the standard model plots provided by R (no ggplot, 
 ## see lecture notes for syntax)
 
+par(mfcol=c(2,3))
+plot(lm3)
+which=seq(1,6)
+
 ## l) Which plot do you turn to to check for homogeneity of residuals (homoscedasticity)? What do you conclude?
 
+#### You turn to the Scale-Location plot. The red line is approximately flat and 
+#### horizontal. This indicates that variance is nearly constant. 
+
 ## m) Which one do you use for normality of residuals? What is your conclusion?
+
+#### You use the Q-Q Residuals plot for the normality of residuals. The points 
+#### approximately follow the straight, dotted line, which indicates that the 
+#### residuals are normally distributed.
 
 ################################
 ### Exercise 3 LM outliers
