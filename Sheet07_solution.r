@@ -10,12 +10,12 @@
 ## Submit your homework via cms
 
 ## Please write below your (and your teammates) name, matriculation number. 
-## Name:
-## Matriculation number:
-## Name:
-## Matriculation number:
-## Name:
-## Matriculation number:
+## Name: Yana Veitsman
+## Matriculation number: 7054842
+## Name: Anthony Dsouza
+## Matriculation number: 7053485
+## Name: Tyler Lee
+## Matriculation number: 7054832
 
 ###############################################################################
 ###############################################################################
@@ -43,11 +43,33 @@ data_long = anorexia%>% pivot_longer(c(Postwt,Prewt), names_to = "Time", values_
 ## a) Please rerun the two-way interaction model from sheet 5 (modelling weight by time and treatment and
 ##  their interaction for the data_long data set)
 
+aov2way <- aov(formula=Weight ~ Time * Treat, data = data_long)
+
 ## b) Run the levene test for this model
 
+leveneTest(aov2way)
+
 ## c) What do you conclude?
+## Given Time and Treatment (F(5, 138)=1.9042, p>0.05) we cannot reject the null 
+## hypothesis about the equality of variance in the 2 groups, hence we can assume
+## their homoscedacity.
 
 ## d) Look at homoscedacity using plots instead
+
+## Using residuals vs. fitted
+ggplot(data_long, aes(fitted(aov2way), residuals(aov2way))) +
+  geom_point(color="blue") +
+  geom_hline(yintercept=0, linetype="dashed", color="red")
+
+# Using Scale-Location
+ggplot(data_long, aes(fitted(aov2way), residuals(aov2way))) +
+  geom_point(color="blue") +
+  geom_smooth(se=FALSE, method="lm", color="red")
+
+# Using residuals vs.leverage
+ggplot(data_long) +
+  geom_point(aes(x=hatvalues(aov2way), y=rstandard(aov2way)), color="blue") +
+  geom_hline(yintercept=0, linetype="dashed", color="red")
 
 ################################
 ### Exercise 2 LM assumptions
@@ -62,6 +84,7 @@ data <- Salaries
 ##  Store it in lm1
 
 lm1 <- lm(formula = salary ~ yrs.service, data=data)
+summary(lm1)
 
 ## c) Report and explain the effect of 'years in service'
 
@@ -76,6 +99,7 @@ ggplot(data, aes(x=yrs.service, y=salary)) +
 ## e) Next, fit a model of salary including 'years in service' and discipline as predictors, store it in lm2
 
 lm2 <- lm(formula = salary ~ yrs.service + discipline + 0, data=data)
+summary(lm2)
 
 ## f) Report and explain the effects of 'years in service' and discipline.
 
