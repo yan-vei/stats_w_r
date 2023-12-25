@@ -50,23 +50,24 @@ aov2way <- aov(formula=Weight ~ Time * Treat, data = data_long)
 leveneTest(aov2way)
 
 ## c) What do you conclude?
-## Given Time and Treatment (F(5, 138)=1.9042, p>0.05) we cannot reject the null 
-## hypothesis about the equality of variance in the 2 groups, hence we can assume
-## their homoscedacity.
+
+### Given Time and Treatment (F(5, 138)=1.9042, p>0.05) we cannot reject the null 
+### hypothesis about the equality of variance in the 2 groups, hence we can assume
+### their homoscedacity.
 
 ## d) Look at homoscedacity using plots instead
 
-## Using residuals vs. fitted
+### Using residuals vs. fitted
 ggplot(data_long, aes(fitted(aov2way), residuals(aov2way))) +
   geom_point(color="blue") +
   geom_hline(yintercept=0, linetype="dashed", color="red")
 
-# Using Scale-Location
+### Using Scale-Location
 ggplot(data_long, aes(fitted(aov2way), residuals(aov2way))) +
   geom_point(color="blue") +
   geom_smooth(se=FALSE, method="lm", color="red")
 
-# Using residuals vs.leverage
+### Using residuals vs.leverage
 ggplot(data_long) +
   geom_point(aes(x=hatvalues(aov2way), y=rstandard(aov2way)), color="blue") +
   geom_hline(yintercept=0, linetype="dashed", color="red")
@@ -88,7 +89,7 @@ summary(lm1)
 
 ## c) Report and explain the effect of 'years in service'
 
-#### For every year in service, salary increases by 779.6 dollars.
+### For every year in service, salary increases by 779.6 dollars.
 
 ## d) Make a scatterplot of salary by 'years in service', including the regression line
 
@@ -103,10 +104,10 @@ summary(lm2)
 
 ## f) Report and explain the effects of 'years in service' and discipline.
 
-#### For every year in service, salary is expected to increase by 862.8 dollars. 
-#### The salary with no years of service is expected to be 91335.8 dollars if 
-#### the professor is of discipline A. The salary with no years of service is
-#### expected to be 104519.9 dollars if the professor is of discipline B.
+### For every year in service, salary is expected to increase by 862.8 dollars. 
+### The salary with no years of service is expected to be 91335.8 dollars if 
+### the professor is of discipline A. The salary with no years of service is
+### expected to be 104519.9 dollars if the professor is of discipline B.
 
 ##  Next we want to plot a model where both predictors are shown. For those we first store the predicted values
 ## of our model:
@@ -135,14 +136,14 @@ ggplot(data, aes(x=yrs.service, y=salary, color=discipline)) +
 
 ## j) Report the results of lm3 and interpret with the help of the graph in i)
 
-#### For professors of discipline A, salary is predicted to increase rapidly
-#### until about 15 years of service, plateau until about 35 years of service
-#### and increase at a moderate rate thereafter.
+### For professors of discipline A, salary is predicted to increase rapidly
+### until about 15 years of service, plateau until about 35 years of service
+### and increase at a moderate rate thereafter.
 
-#### For professors of discipline B, salary is predicted to rapidly increase 
-#### until about 10 years of service, increase at a steadily decreasing rate  
-#### until about 20 years of service and then decrease at a steadily increasing
-#### rate thereafter.
+### For professors of discipline B, salary is predicted to rapidly increase 
+### until about 10 years of service, increase at a steadily decreasing rate  
+### until about 20 years of service and then decrease at a steadily increasing
+### rate thereafter.
 
 ## k) To do model checking on your model lm3, i.e. inspect the standard model plots provided by R (no ggplot, 
 ## see lecture notes for syntax)
@@ -153,14 +154,14 @@ which=seq(1,6)
 
 ## l) Which plot do you turn to to check for homogeneity of residuals (homoscedasticity)? What do you conclude?
 
-#### You turn to the Scale-Location plot. The red line is approximately flat and 
-#### horizontal. This indicates that variance is nearly constant. 
+### You turn to the Scale-Location plot. The red line is approximately flat and 
+### horizontal. This indicates that variance is nearly constant. 
 
 ## m) Which one do you use for normality of residuals? What is your conclusion?
 
-#### You use the Q-Q Residuals plot for the normality of residuals. The points 
-#### approximately follow the straight, dotted line, which indicates that the 
-#### residuals are normally distributed.
+### You use the Q-Q Residuals plot for the normality of residuals. The points 
+### approximately follow the straight, dotted line, which indicates that the 
+### residuals are normally distributed.
 
 ################################
 ### Exercise 3 LM outliers
@@ -171,13 +172,35 @@ which=seq(1,6)
 
 lm4 <- lm(formula = salary ~ yrs.since.phd + discipline + 
             yrs.since.phd * discipline + 0, data=data)
+summary(lm4)
 
 ## b) look at the model summary. Which effects are significant?
 
-#### The effect of years since phd and discipline on salary are significant with
-#### alpha = 0.05; however, the effect of the interaction between years since phd 
-#### and discipline on salary is not significant.
+### Years since Phd and Discipline on salary with (F(393,4)=1873, p<0.05) are
+### significant; however, the interaction b/n Years since Phd and discipline is 
+### not significant with pr(>t)>0.05.
 
 ## c) How do you check for influential data points (aka bad outliers)?
 
+### Let's use leverage values for this
+ggplot(data, aes(hatvalues(lm4), rstandard(lm4))) +
+  geom_point(color="blue") +
+  geom_hline(yintercept=0, linetype="dashed", color="red")
+
+### High leverage points extend along x-axis. 
+
 ## d) Try fitting the same model with the most suspicious data point excluded. What do you find?
+
+### Let's exclude the data point with the biggest hat value.
+index <- which.max(hatvalues(lm4))
+
+### Exclude the value from the dataset
+data_with_excluded <- data[-index, ]
+
+### Run the same model and show summary
+lm_with_excluded <- lm(formula = salary ~ yrs.since.phd + discipline + 
+            yrs.since.phd * discipline + 0, data=data_with_excluded)
+summary(lm_with_excluded)
+
+### The interaction b/n Years since Phd and Discipline with (F(392, 4)=1859, p<0.05)
+### is significant.
