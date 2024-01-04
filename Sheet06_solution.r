@@ -13,9 +13,13 @@
 ## Make sure that you answered all subquestions and that the code runs!
 
 
-## Please write below your (and your teammates') name, matriculation number. 
-## Name: 
-## Matriculation number: 
+## Please write below your (and your teammates) name, matriculation number. 
+## Name: Yana Veitsman
+## Matriculation number: 7054842
+## Name: Anthony Dsouza
+## Matriculation number: 7053485
+## Name: Tyler Lee
+## Matriculation number: 7054832
 
 ###########################################################################################
 ###########################################################################################
@@ -102,11 +106,13 @@ econ_life <- cor.test(AsiaMale$lifeMale, AsiaMale$GDPperCapita,
 illit_life <- cor.test(AsiaMale$lifeMale, AsiaMale$illiteracyMale, 
                        method='spearman')
 
-paired.r(econ_life$estimate, illit_life$estimate, n=48)
+paired.r(econ_life$estimate, illit_life$estimate, n=44)
+
+### 44 degrees of freedom, since 4 rows have missing data
 
 ## l) What do you conclude from k?
 
-#### Based on the z-value of 5.62, it seems that the correlations
+#### Based on the z-value of 5.36, it seems that the correlations
 #### are different; one correlation is negative, the other positive.
 
 ## m) What would be the result, if the two variables would be independent?
@@ -145,13 +151,13 @@ intercept <- firstModel$coefficients[['(Intercept)']]
 predictedLife <- slope * AsiaMale$GDPt + intercept
 
 SS.resid <- sum( (AsiaMale$lifeMale - predictedLife)^2, na.rm=TRUE)
-SS.tot <- sum( (AsiaMale$lifeMale - mean(AsiaMale$lifeMale))^2)
+life_male_mean <- mean(AsiaMale$lifeMale)
+SS.tot <- sum( (AsiaMale$lifeMale - life_male_mean)^2, na.rm=TRUE)
 Rsquared <- 1 - (SS.resid / SS.tot)
 Rsquared
-summary(firstModel)
 
-#### GDP per capita (in thousands of dollars) explains 48.74507% of the 
-#### variance in male life expectancy.
+#### GDP per capita (in thousands of dollars) positively and moderately correlates 
+#### with the variance in male life expectancy.
 
 ## d) Now let's turn to the relationship between life expectancy and illiteracy.  Run the regression and 
 # interpret.
@@ -163,7 +169,7 @@ secondModel <- lm(AsiaMale$lifeMale ~ AsiaMale$illiteracyMale, AsiaMale)
 ggplot(AsiaMale, aes(x=illiteracyMale, y=lifeMale)) +
   geom_point() +
   geom_abline(slope=secondModel$coefficients[['AsiaMale$illiteracyMale']], 
-              intercept=secondModel$coefficients[['(Intercept)']]) #issue: missing values
+              intercept=secondModel$coefficients[['(Intercept)']])
 
 ###################################
 ### Exercise 3: Multiple Regression
@@ -201,22 +207,37 @@ SS.resid <- sum((AsiaMale$lifeMale - mr_predictedlife)^2, na.rm = TRUE)
 SS.resid
 SS.tot <- sum((AsiaMale$lifeMale - mean(AsiaMale$lifeMale))^2, na.rm = TRUE)
 SS.tot
-Rsquared <- 1 - (SS.resid/SS.tot) #### 0.7456831
+Rsquared <- 1 - (SS.resid/SS.tot)
 Rsquared
 
 #### As we can see, as the number of predictor variables increases, the Rsquared value increases too.
-#### GDPt and % of illierate males explains 74.56% of the variance in predicted life expectancy, which
+#### GDPt and % of illiterate males explains 74.56% of the variance in predicted life expectancy, which
 #### is more than the first two models.
 
 ## d) Look up the GDP and illiteracyMale for United.States and Brazil in the original data set (UN98)
 
-US_B_Male <- filter(UN98, region == 'America.United.States' & region == 'America.Brazil') %>% 
-  select(educationMale, lifeMale, GDPperCapita, economicActivityMale, 
-         illiteracyMale)
+### We weren't able to do the extraction with the .filter method, so this is done
+### instead
+US_B_Male <- UN98[c('United.States', 'Brazil'),]
+
+US_B_Male_illiteracy <- US_B_Male$illiteracyMale
+US_B_Male_GDPt <- US_B_Male$GDPperCapita
+
+US_B_Male_illiteracy
+US_B_Male_GDPt
 
 ## e) Using the model from 3a:  What is the predicted life expectancy for United.States and Brazil?
 ##  Calculate "by hand", i.e. do not use predict() and show your calculation. Don't forget to divide
 ##  the GDPperCapita by 1000 first!
+
+US_predicted <- mr_slope1 * (US_B_Male_GDPt[1] / 1000) + mr_slope2 * 
+  US_B_Male_illiteracy[1] + mr_intercept
+
+B_predicted <- mr_slope1 * (US_B_Male_GDPt[2] / 1000) + mr_slope2 * 
+  US_B_Male_illiteracy[2] + mr_intercept
+
+US_predicted
+B_predicted
 
 ## f) Run an additional model of life expectancy for the AsiaMale data set including also economicActivityMale
 
