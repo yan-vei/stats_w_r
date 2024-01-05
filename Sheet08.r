@@ -66,7 +66,8 @@ aggDataSummary <- aggDataSummary %>%
 ggplot(data = aggData, mapping = aes(x = Time, y = weight, color = Diet)) +
   geom_line() +
   geom_point() +
-  geom_errorbar(mapping = aes(ymin = aggDataSummary$low_ci, ymax = aggDataSummary$up_ci), width = 0.2)
+  geom_errorbar(mapping = aes(ymin = aggDataSummary$low_ci, ymax = aggDataSummary$up_ci), width = 0.3) +
+  facet_wrap(~ Diet, nrow = 1, scales = "free_y")
 
 ## c) The above plot ignored that the data comes from a fixed set of chicks. Let's look at individual growth
 ##    by coloring by Chick instead of by Diet, but faceting by Diet (side by side). You have to use ChickWeight 
@@ -79,7 +80,7 @@ ggplot(data = ChickWeight, mapping = aes(x = Time, y = weight, color = Chick)) +
 
 ## d) What do you observe, looking at c?
 
-### Over time, the weight of the chicks increases linearly (almost) for most Chicks. Diet 4 and Diet 1 seem the best
+### [Check] Over time, the weight of the chicks increases linearly (almost) for most Chicks. Diet 4 and Diet 1 seem the best
 ### and worst respectively
 
 ## e) We want to investigate whether the type of diet has an effect on the chick's growth, i.e. we are
@@ -88,43 +89,37 @@ ggplot(data = ChickWeight, mapping = aes(x = Time, y = weight, color = Chick)) +
 
 ##    1) What fixed effect(s) do you enter into the model?
 
-### Diet and time will be the fixed effects as these are variables we can
-### control in our experiment.
+###      Diet and time will be the fixed effects as these are variables we can
+###      control in our experiment.
 
 ##    2) what random effect(s) should be included to account for the repeated measures structure of the data?
 
-### the Chicks will be he random effects as we have no control on how they will respond
-### to the fixed effects (diet and time).
+###      Chicks will be he random effects as we have no control on how they will respond
+###      to the fixed effects (diet and time).
 
 ##    3) In addition to random intercept(s), which random slope(s) should you add to get a maximal model?
 
-### We should add Diet | Chick and Time | Chick
+###      We should add Diet | Chick and Time | Chick as random slopes
+
 
 ## f) Run the model you specified in e) using lmer() and assign it to chickmod
 
-chickmod <- lmer(weight ~ Diet * Time + (1|Chick), 
-                         data = ChickWeight)
-
-chickmod.test <- lmer(weight ~ Diet * Time + (Diet|Chick), 
-                 data = ChickWeight)
-
-chickmod.control <- lmer(weight ~ Diet * Time + (1|Chick), 
+chickmod <- lmer(weight ~ Diet * Time + (1 + Diet|Chick) + (1 + Time|Chick), 
                  data = ChickWeight,
-                 control = lmerControl(optimizer = "Nelder_Mead"))
+                 REML = FALSE)
 
-chickmod.diet <- lmer(weight ~ Diet * Time + (Diet|Chick),
-                      data = ChickWeight,
-                      control = lmerControl(optimizer = "Nelder_Mead"))
-# chickmod.time <- lmer(weight ~ Diet * Time + (1 + time|Chick), data = ChickWeight)
+
 
 
 ## g) Rerun the model leaving out the interaction between Time and Diet and assign it to chicknull
-chicknull <- lmer(weight ~ Diet + Time + (1|Chick), data = ChickWeight)
-
+chicknull <- lmer(weight ~ Diet + Time + (1 + Diet|Chick) + (1 + Time|Chick), 
+                 data = ChickWeight,
+                 REML = FALSE)
 
 ## h) compare the two models using the anova() function, which performs a likelihood ratio test
 anova(chickmod, chicknull)
-anova(chickmod.control, chicknull)
+#### check aic, bic. the lower the score, the better the model. loglikelihood has to be bigger.
+
 
 ## i) Report the p-value (from h) and the conclusion with respect to the research hypothesis
 
@@ -151,7 +146,9 @@ m3 = lmer(RT ~ PrevType + Complex + (PrevType+Complex|Subject) + (PrevType+Compl
 m4 = lmer(RT ~ PrevType + Complex + (         Complex|Subject) + (PrevType        | Word), lexdec)
 m5 = lmer(RT ~ PrevType + Complex + (PrevType+Complex|Subject) + (1               | Word), lexdec)
 
+anova(m1, m2, m3, m4, m5)
 
+### Looking at the anova output, m4 looks like the best model from the  AIC and BIC values (AIC : -950.28, BIC : -896.14)
 
 ## b) You want to relate students' performance in the advanced algebra course in a summer school in Saarbrücken
 ##    to their final math grade in school. The summer school course has 200 participants, coming from 8 different
