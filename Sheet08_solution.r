@@ -10,12 +10,12 @@
 ## Submit your homework via cms
 
 ## Please write below your (and your teammates) name, matriculation number. 
-## Name:
-## Matriculation number:
-## Name:
-## Matriculation number:
-## Name:
-## Matriculation number:
+## Name: Yana Veitsman
+## Matriculation number: 7054842
+## Name: Anthony Dsouza
+## Matriculation number: 7053485
+## Name: Tyler Lee
+## Matriculation number: 7054832
 
 ###############################################################################
 ###############################################################################
@@ -51,7 +51,6 @@ library(Rmisc)
 
 aggData  <- ChickWeight%>%
   group_by(Diet, Time) 
-  #summarySE(measurevar = "weight")
 
 aggDataSummary <- summarySE(data = aggData, measurevar = "weight")
 
@@ -80,8 +79,11 @@ ggplot(data = ChickWeight, mapping = aes(x = Time, y = weight, color = Chick)) +
 
 ## d) What do you observe, looking at c?
 
-### [Check] Over time, the weight of the chicks increases linearly (almost) for most Chicks. Diet 4 and Diet 1 seem the best
-### and worst respectively
+### Over time, the weight increases linearly for chicks of all diets. 
+### However, Diet 1 seems to be influencing the weight less, given that the majority
+### of the chicks only reach the weight of 200 by the end of the measuring period.
+### On the contrary, Diets 3 and 4 seem to be the best fit, given that most 
+### of the chicks grow beyond the weight of 200.
 
 ## e) We want to investigate whether the type of diet has an effect on the chick's growth, i.e. we are
 ##    looking for an interaction between time after birth and the diet type. Before running the model,
@@ -89,45 +91,48 @@ ggplot(data = ChickWeight, mapping = aes(x = Time, y = weight, color = Chick)) +
 
 ##    1) What fixed effect(s) do you enter into the model?
 
-###      Diet and time will be the fixed effects as these are variables we can
-###      control in our experiment.
+###      Diet and time will be the fixed effects as these are variables are assumed
+###      to have a constant effect on the DV.
 
 ##    2) what random effect(s) should be included to account for the repeated measures structure of the data?
 
-###      Chicks will be he random effects as we have no control on how they will respond
-###      to the fixed effects (diet and time).
+###      The random effect for an each individual chick should be included, so we
+###      can account for the individual variability between the subjects.
 
 ##    3) In addition to random intercept(s), which random slope(s) should you add to get a maximal model?
 
-###      We should add Diet | Chick and Time | Chick as random slopes
+###      We need to add a random intercept for Chick and a random slope for Time.
 
 
 ## f) Run the model you specified in e) using lmer() and assign it to chickmod
-
-chickmod <- lmer(weight ~ Diet * Time + (1 + Diet|Chick) + (1 + Time|Chick), 
-                 data = ChickWeight,
-                 REML = FALSE)
-
-
+chickmod <- lmer(weight ~ Diet * Time + (1 + Time | Chick), data = ChickWeight)
 
 
 ## g) Rerun the model leaving out the interaction between Time and Diet and assign it to chicknull
-chicknull <- lmer(weight ~ Diet + Time + (1 + Diet|Chick) + (1 + Time|Chick), 
-                 data = ChickWeight,
-                 REML = FALSE)
+chicknull <- lmer(weight ~ Diet + Time + (1 + Time|Chick), 
+                 data = ChickWeight)
 
 ## h) compare the two models using the anova() function, which performs a likelihood ratio test
 anova(chickmod, chicknull)
-#### check aic, bic. the lower the score, the better the model. loglikelihood has to be bigger.
 
+### Given the (chicknull, AIC) = 4834.1, (chicknull, BIC) = 4873.3 and
+### (chickmod, AIC) = 4824.2, (chickmod, BIC) = 4876.5, and corresponding log likelihoods
+### of -2408 and -2400.1, the chickmod model seems to be a slightly better fit
+### to the data.
 
 ## i) Report the p-value (from h) and the conclusion with respect to the research hypothesis
 
+### Given (3,22) and p=0.001217 at the significance level of 0.05, we can reject the 
+### the null hypothesis and conclude that the more complex model (chickmod)
+### is the better fit, confirming our suggestion from h.
 
 ## j) The following code creates a plot of all chick specific intercepts and slopes. What do you see?
 print(dotplot(ranef(chickmod,condVar=TRUE),  scales = list(x = list(relation = 'free')))[["Chick"]])
 
-
+### From the plot we can see that there seems to be a high variability in how 
+### chicks respond to fixed effects. There seem to be no apparent clusters
+### or outliers in the plot, however, the slope is steep, which indicates
+### a substantial change in weight.
 
 #####################################################
 ### 2. Random effect structures 
@@ -148,7 +153,12 @@ m5 = lmer(RT ~ PrevType + Complex + (PrevType+Complex|Subject) + (1             
 
 anova(m1, m2, m3, m4, m5)
 
-### Looking at the anova output, m4 looks like the best model from the  AIC and BIC values (AIC : -950.28, BIC : -896.14)
+### m4(AIC=-950.28, BIC=-896.14) appears to be the best fit model, based on the 
+### ANOVA results.
+### m4 captures random intercepts for Complex within Subject and PrevType within 
+### Word, and it seems to be the best fit for the variability in the study.
+### other models include more random slopes and intercepts as necessary,
+### which might lead to overfitting (aka simple memorization) of the data.
 
 ## b) You want to relate students' performance in the advanced algebra course in a summer school in Saarbrücken
 ##    to their final math grade in school. The summer school course has 200 participants, coming from 8 different
@@ -157,13 +167,25 @@ anova(m1, m2, m3, m4, m5)
 ##    Given the design of your study, what random effects should you add to the following model:
 ##    NOTE: We accept only answers with explanations!
 
-## lmer(advancedalgebrascore ~ mathGrade, someData)
+### In this case, we need to account for both between and within subject variability.
+
+### We should include the individual variability between students as a random effect to
+### account for the within-subject variability.
+
+### Our random intercepts should include the tutorial groups nested within universities
+### to alleviate the variability of the students backgrounds as well as the tutors
+### themselves (given that individual tutor's teaching might also influence the DV)
+### to account for between-subject variability.
 
 
-
-
-
-
+### The formula therefore is:
+#lmer(advancedAlgebraScore ~ mathGrade + (tutorialGroup + student | university) 
+#+ (1 + student) + (student | tutor), data=ourData)
+### Where mathGrade is the fixed effect, (tutorialGroup + student | university) 
+### is the inclusion of the random intercept and the slope of the tutorial group
+### and student nested within the university, and (student | tutor) is the inclusion
+### of the random intercept and slope reflecting the influence of the tutor on 
+### the student.
 
 
 #################################### REFERENCE ######################################
