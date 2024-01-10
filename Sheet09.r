@@ -140,30 +140,80 @@ logits2prob(logits)
 
 ## a) Download the data set from cms and read it in, store it in a variable called: coffeedat
 
+coffeedat <- read.csv("coffee.csv")
+
 ## b) Plot the number of consumed cups of coffee in three individual scatterplots 
 ##    by sleep, mood, and temperature. 
 ##    You can use geom_jitter() to get a nicer plot
 
+ggplot(data = coffeedat, aes(x=sleep, y=coffee)) +
+  geom_jitter()
+
+ggplot(data = coffeedat, aes(x=mood, y=coffee)) +
+  geom_jitter()
+
+ggplot(data = coffeedat, aes(x=temperature, y=coffee)) +
+  geom_jitter()
+
 ## c) Can you detect an obvious relationship in any of the plots?
 
+# No
+
 ## d) Fit a simple linear regression model with all three predictors and store it in linmod
+
+linmod <- lm(formula = coffee ~ sleep + mood + temperature, 
+             data = coffeedat)
 
 ## e) Fit a generalized linear model with the appropriate family 
 ##    (hint: coffee is a count variable) and store it in poimod
 
+poimod <- glm(formula = coffee ~ sleep + mood + temperature, 
+              data = coffeedat,
+              family = poisson)
+
 ## f) Look at the two summaries of the models and write what changed?
+
+summary(linmod)
+summary(poimod)
+
+# The coefficients of all predictors and the intercept have all changed. 
+# Additionally, the coefficients are all statistically significant 
+# (p = 0.005280, p = 0.000273, p = 0.025555 for sleep, mood and temperature, 
+# respectively) for poimod, while only the coefficient of mood was
+# statistically significant (p = 0.051044, p = 0.011737, p = 0.123631 for 
+# sleep, mood and temperature, respectively) for linmod.
 
 ## g) In fact, we have repeated measures in our design, so refit the model 
 ##    including a random intercept for subject using glmer() with the correct 
 ##    family specification and store it in mixedpoi
 
+mixedpoi <- glm(formula = coffee ~ sleep + mood + temperature + (1|subj),
+                data = coffeedat,
+                family = poisson)
+
 ## h) Look at the summary and report what changed in comparison to both linmod and poimod.
+
+# poimod and mixedpoi are identical... (fix later)
 
 ## i) Finally, to make it complete, also run a mixed model using the gaussian family and store it in mixedlin
 
+mixedlin <- glm(formula = coffee ~ sleep + mood + temperature + (1|subj),
+                data = coffeedat,
+                family = gaussian)
+
+# note to self: mixedlin and mixedpoi are identical to linmod and poimod, 
+# respectively. that's sus, please address
+
 ## j) Compare the AIC for all four models. Which one has the best fit?
 
+AIC(linmod, poimod, mixedlin, mixedpoi) 
+
+# linmod and mixedlin have the best fit (note to self: address issue with 
+# these being identical )
+
 ## k) And which model is conceptually the appropriate one? Explain why.
+
+# 
 
 ## l) Finally, report on the effects of interest in light of our research hypotheses 
 ##    specified above for the model you chose in k)
