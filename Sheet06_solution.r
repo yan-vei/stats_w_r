@@ -136,6 +136,7 @@ AsiaMale$GDPt = AsiaMale$GDPperCapita/1000
 
 firstModel <- lm(AsiaMale$lifeMale ~ AsiaMale$GDPt, AsiaMale) 
 summary(firstModel)
+
 ## b) Interpret the model from a. What do intercept and the coefficient of GDPt tell you?
 
 #### The intercept indicates that the male life expectancy for 
@@ -148,13 +149,21 @@ summary(firstModel)
 slope <- firstModel$coefficients[['AsiaMale$GDPt']]
 intercept <- firstModel$coefficients[['(Intercept)']]
 
-predictedLife <- slope * AsiaMale$GDPt + intercept
+predictedLife <- (slope * AsiaMale$GDPt) + intercept
 
 SS.resid <- sum( (AsiaMale$lifeMale - predictedLife)^2, na.rm=TRUE)
+<<<<<<< Updated upstream
 life_male_mean <- mean(AsiaMale$lifeMale)
 SS.tot <- sum( (AsiaMale$lifeMale - life_male_mean)^2, na.rm=TRUE)
 Rsquared <- 1 - (SS.resid / SS.tot)
 Rsquared
+=======
+SS.tot <- sum( (AsiaMale$lifeMale - mean(AsiaMale$lifeMale))^2)
+
+Rsquared <- 1 - (SS.resid / SS.tot)
+Rsquared
+firstModel$r.squared
+>>>>>>> Stashed changes
 
 #### GDP per capita (in thousands of dollars) positively and moderately correlates 
 #### with the variance in male life expectancy.
