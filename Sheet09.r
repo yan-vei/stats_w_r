@@ -54,16 +54,16 @@ mRel <- glm(
 
 summary(mRel)
 
-### The intercept corresponds to the estimated log odds of the response variable 
-### (Released in this case) being in the success category when all others predictor
-### variables are 0
+# The intercept corresponds to the estimated log odds of the response variable 
+# (released in this case) being in the success category when all others predictor
+# variables are 0
 
 ## c) Were older offenders more likely to be released than young ones?
 
-### Considering that Age has a -ve coefficient (-1.054e-02), older offenders
-### are less likely to be released in comparison to younger inmates. Also seeing 
-### the p-value for Age is 0.0141 (p-value < 0.05), shows that the effect of age 
-### on "Released" is statistically significant.
+# Considering that age has a negative coefficient (-1.054e-02), older offenders
+# are less likely to be released in comparison to younger inmates. Also seeing 
+# the p-value for age is 0.0141 (p-value < 0.05), shows that the effect of age 
+# on "Released" is statistically significant.
 
 ## d) Imagine the Toronto police arrested two persons for marijuana possession:
 ##    Jeffrey L. was arrested in 2001, aged 52 and white, Snoop D. was arrested 
@@ -116,8 +116,9 @@ logits2prob <- function(x){
 
 logits2prob(logits)
 
-### from the calculation by hand, we see that Jeffery L. has a higher probability of 
-### being released (probability = 0.8316179) as compared to Snoop D (probability = 0.6757119)
+# from the calculation by hand, we see that Jeffery L. has a higher 
+# probability of being released (probability = 0.8316179) as compared to 
+# Snoop D (probability = 0.6757119)
 
 
 ##################################################################################
