@@ -79,31 +79,10 @@ name <- c("Jeffery L.", "Snoop D")
 test.data = data.frame(name, age, colour, year)
 
 
-
 logits <- predict(
   mRel, 
   newdata = test.data
 )
-
-## just to check if my calculation is correct 
-logits.prob <- predict(
-  mRel, 
-  newdata = test.data, 
-  family = "binomial",
-  type = "response"
-) 
-
-
-
-######## RESULT ########  
-##        1         2 ##
-## 0.8316179 0.6757119##
-
-### calculation is correct
-
-####################### By hand #######################
-
-### I'll do it later
 
 ## e) Transform your results from d to the probability scale, using the formula given on the slides. 
 ##    You can check your calculation by asserting the probabilities lie in the 0-1 range. 
@@ -116,7 +95,7 @@ logits2prob <- function(x){
 
 logits2prob(logits)
 
-# from the calculation by hand, we see that Jeffery L. has a higher 
+# From the calculation we establish that Jeffery L. has a higher 
 # probability of being released (probability = 0.8316179) as compared to 
 # Snoop D (probability = 0.6757119)
 
@@ -157,7 +136,9 @@ ggplot(data = coffeedat, aes(x=temperature, y=coffee)) +
 
 ## c) Can you detect an obvious relationship in any of the plots?
 
-# No
+# There seem to be slight negative and positive relationships in the first
+# and the third plot respectively. The second plot, however, is very disperse
+# and the relationship is not clear.
 
 ## d) Fit a simple linear regression model with all three predictors and store it in linmod
 
@@ -167,9 +148,9 @@ linmod <- lm(formula = coffee ~ sleep + mood + temperature,
 ## e) Fit a generalized linear model with the appropriate family 
 ##    (hint: coffee is a count variable) and store it in poimod
 
-poimod <- glmer(formula = coffee ~ sleep + mood + temperature, 
+poimod <- glm(coffee ~ sleep + mood + temperature, 
               data = coffeedat,
-              family = poisson)
+              family = "poisson")
 
 ## f) Look at the two summaries of the models and write what changed?
 
@@ -177,11 +158,10 @@ summary(linmod)
 summary(poimod)
 
 # The coefficients of all predictors and the intercept have all changed. 
-# Additionally, the coefficients are all statistically significant 
-# (p = 0.005280, p = 0.000273, p = 0.025555 for sleep, mood and temperature, 
-# respectively) for poimod, while only the coefficient of mood was
-# statistically significant (p = 0.051044, p = 0.011737, p = 0.123631 for 
-# sleep, mood and temperature, respectively) for linmod.
+# In the linmod, only the result for temperature, t(3, 96) = 1.553, p < 0.05 is 
+# significant. However, in the poimod, the results for all, 
+# sleep (t(3, 96)=-2.789, p<0.05), mood (t(3,96)=-3.64, p<0.05)
+# and temperature (t(3,96)=2.233, p<0.05)
 
 ## g) In fact, we have repeated measures in our design, so refit the model 
 ##    including a random intercept for subject using glmer() with the correct 
@@ -193,7 +173,11 @@ mixedpoi <- glmer(formula = coffee ~ sleep + mood + temperature + (1|subj),
 
 ## h) Look at the summary and report what changed in comparison to both linmod and poimod.
 
-# poimod and mixedpoi are identical... (fix later)
+summary(mixedpoi)
+
+# In mixedpoi model the results for the sleep (t(3,96)=-2.697, p<0.05) and 
+# mood (t(3,96)=-4.014, p<0.05) stay significant, while the result for 
+# the temperature value is not significant (t(3,96)=1.242, p>0.05).
 
 ## i) Finally, to make it complete, also run a mixed model using the gaussian family and store it in mixedlin
 
@@ -201,19 +185,32 @@ mixedlin <- glmer(formula = coffee ~ sleep + mood + temperature + (1|subj),
                 data = coffeedat,
                 family = gaussian)
 
-# note to self: mixedlin and mixedpoi are identical to linmod and poimod, 
-# respectively. that's sus, please address
-
 ## j) Compare the AIC for all four models. Which one has the best fit?
 
 AIC(linmod, poimod, mixedlin, mixedpoi) 
 
-# linmod and mixedlin have the best fit (note to self: address issue with 
-# these being identical )
+# mixedpoi model approximates the best fit given its AIC value of
+# 478.7281, which is the lowest across all models (and the lower the AIC-value)
+# is, the better.
 
 ## k) And which model is conceptually the appropriate one? Explain why.
 
-# 
+# Conceptually, the mixed-effects model for the poisson family seems to be the most
+# appropriate. The model accounts for the binary nature of the DV
+# as well as for the random effects of the repeated measures and variations
+# between the subjects.
 
 ## l) Finally, report on the effects of interest in light of our research hypotheses 
 ##    specified above for the model you chose in k)
+
+# Students consume more coffee, when they are tired - correct. Given 
+# t(3,96)=-2.697, p<0.05 for sleep, we can reject the null hypothesis of coffee
+# consumed and sleep amount not having a correlation.
+
+# Students consume more coffee, if they don't feel well - correct. Given
+# t(3,96)=-4.014, p<0.05 for mood, we can reject the null hypothesis of coffee
+# consumed and mood not having a correlation.
+
+# Students consume more coffee, when it is cold outside - incorrect. Given
+# t(3,96)=1.242, p>0.05, we cannot reject the null hypothesis of the outside
+# temperature and coffee consumption not being correlated.
