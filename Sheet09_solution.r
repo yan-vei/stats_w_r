@@ -10,12 +10,12 @@
 ## Submit your homework via cms
 
 ## Please write below your (and your teammates) name, matriculation number. 
-## Name:
-## Matriculation number:
-## Name:
-## Matriculation number:
-## Name:
-## Matriculation number:
+## Name: Yana Veitsman
+## Matriculation number: 7054842
+## Name: Anthony Dsouza
+## Matriculation number: 7053485
+## Name: Tyler Lee
+## Matriculation number: 7054832
 
 ##################################################################################
 ##################################################################################
@@ -167,7 +167,7 @@ linmod <- lm(formula = coffee ~ sleep + mood + temperature,
 ## e) Fit a generalized linear model with the appropriate family 
 ##    (hint: coffee is a count variable) and store it in poimod
 
-poimod <- glm(formula = coffee ~ sleep + mood + temperature, 
+poimod <- glmer(formula = coffee ~ sleep + mood + temperature, 
               data = coffeedat,
               family = poisson)
 
@@ -187,9 +187,9 @@ summary(poimod)
 ##    including a random intercept for subject using glmer() with the correct 
 ##    family specification and store it in mixedpoi
 
-mixedpoi <- glm(formula = coffee ~ sleep + mood + temperature + (1|subj),
+mixedpoi <- glmer(formula = coffee ~ sleep + mood + temperature + (1|subj),
                 data = coffeedat,
-                family = poisson)
+                family = "poisson")
 
 ## h) Look at the summary and report what changed in comparison to both linmod and poimod.
 
@@ -197,7 +197,7 @@ mixedpoi <- glm(formula = coffee ~ sleep + mood + temperature + (1|subj),
 
 ## i) Finally, to make it complete, also run a mixed model using the gaussian family and store it in mixedlin
 
-mixedlin <- glm(formula = coffee ~ sleep + mood + temperature + (1|subj),
+mixedlin <- glmer(formula = coffee ~ sleep + mood + temperature + (1|subj),
                 data = coffeedat,
                 family = gaussian)
 
