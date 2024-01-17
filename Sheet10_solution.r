@@ -10,12 +10,12 @@
 ## Submit your homework via cms
 
 ## Please write below your (and your teammates) name, matriculation number. 
-## Name:
-## Matriculation number:
-## Name:
-## Matriculation number:
-## Name:
-## Matriculation number:
+## Name: Yana Veitsman
+## Matriculation number: 7054842
+## Name: Anthony Dsouza
+## Matriculation number: 7053485
+## Name: Tyler Lee
+## Matriculation number: 7054832
 
 ###############################################################################
 ###############################################################################
@@ -35,7 +35,7 @@ library(languageR)
 ##  effects of complexity, the type of the previous Word and the native 
 ##  language of the participant:
 
-m = lmer(RT ~ PrevType + Complex + NativeLanguage + 
+m <- lmer(RT ~ PrevType + Complex + NativeLanguage + 
               (PrevType + Complex | Subject) + (PrevType + NativeLanguage | Word), 
         data = lexdec, REML = F)
 
@@ -47,10 +47,44 @@ m = lmer(RT ~ PrevType + Complex + NativeLanguage +
 ##    Use model comparison to decide which effects can be excluded.
 ##    You may exclude random effects only, if they don't contribute significantly with alpha set to 0.1
 
+m1 <- lmer(RT ~ PrevType + Complex + NativeLanguage + (PrevType | Subject) + 
+             (PrevType + NativeLanguage | Word), data=lexdec, REML=F)
+m2 <- lmer(RT ~ PrevType + Complex + NativeLanguage + (PrevType + Complex | Subject) +
+             (PrevType | Word), data=lexdec, REML=F)
+m3 <- lmer(RT ~ PrevType + Complex + NativeLanguage + (Complex | Subject) + 
+             (PrevType + NativeLanguage| Word), data=lexdec, REML=F)
+m4 <- lmer(RT ~ PrevType + Complex + NativeLanguage + (Complex | Subject) +
+             (PrevType | Word), data=lexdec, REML=F)
+
+# m1 fails to converge.
+# Try to figure out which model to use by applying ANOVA on m2, m3, and m4.
+
+anova(m2, m3)
+anova(m4, m2)
+anova(m4, m3)
+
+# From ANOVA, we see that m3 is better fit than m4, based on AIC(m3)=-951.52
+# and BIC(m3)=-891, t(3,14)=4.0948, p>0.05 is not significant.
+# m2 is better fit than m3, based on AIC(m2)=-969.89, BIC(m2)=-894.09,
+# t(3,14)=24.372, p<0.05, which is significant.
+
 ## b) Comment on your result in a): were you able to produce a suitable model without convergence problems?
+
+# Yes, by removing the random intercept and the slope for Complex based on the
+# Subject grouping, we were able to produce a suitable converging model.
 
 ## c) Another approach is to simplify the random effect structure by excluding correlations. 
 ##    Try out whether this would have solved the problem.
+
+m_simplified1 <- lmer(RT ~ PrevType + Complex + NativeLanguage + (1 | Subject) + 
+                       (PrevType + NativeLanguage | Word), data=lexdec, REML=F)
+m_simplified2 <- lmer(RT ~ PrevType + Complex + NativeLanguage + 
+                        (PrevType + Complex | Subject) + (1 | Word), 
+                      data=lexdec, REML=F)
+
+# m_simplified1 gives a boundary warning, indicating a potential issue with 
+# the model.
+# m _simplified2, however, converges.
 
 
 ###############################################################################
