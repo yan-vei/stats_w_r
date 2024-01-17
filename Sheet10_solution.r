@@ -86,7 +86,6 @@ m_simplified2 <- lmer(RT ~ PrevType + Complex + NativeLanguage +
 # the model.
 # m _simplified2, however, converges.
 
-
 ###############################################################################
 ### Exercise 2 Simulations and power
 ###############################################################################
@@ -108,13 +107,16 @@ d        <- data.frame(predA, predB, resp)
 
 ## a) What type of predictors are predA and predB?
 
+# predA is binary - it is composed as a vector of 1's and 0's.
+# predB is continuous - as it is derived using the rnorm function.
+
 ## b) Write down what values you would hope for the model to estimate in the ideal case:
 
-#    i)   intercept   = 
-#    ii)  predA       = 
-#    iii) predB       = 
-#    iv)  predA:predB = 
-#    v)   Residual standard error = 
+#    i)   intercept   = 12
+#    ii)  predA       = 4.3
+#    iii) predB       = -2.8
+#    iv)  predA:predB = 0.4
+#    v)   Residual standard error = 8
 
 m1<- lm(resp~predA*predB, data=d)
 summary(m1)  
@@ -122,12 +124,107 @@ summary(m1)
 ## c) Can the model recover the original model structure and estimate correct coefficients 
 ##    for the predictors?
 
+# During different generations we get different values that might be slightly
+# off. However, during the 5 suggested runs, we can observe that each value is
+# recovered almost correctly at least once.
+
 ## d) What happens if you change the number of subjects? (specify the numbers you tried out!)
+
+# Try the following numbers of subjects:
+n <- c(20,100,300,500)
+
+# Within the loop, run the same code as above:
+for (i in 1:length(n)) {
+  
+  num_subj <- n[i]
+  predA    <- c(rep(1,num_subj/2),rep(0,num_subj/2))
+  predB    <- rnorm(num_subj, 3, 2)
+  interact <- 0.4*(predA*predB) 
+  error    <- rnorm(num_subj, 0, 8)
+  resp     <- 12 + 4.3*predA - 2.8*predB + interact + error
+  d        <- data.frame(predA, predB, resp)
+  
+  m<- lm(resp~predA*predB, data=d)
+  print(summary(m))
+}
+
+# It seems that as the number of observations grows, the precision of the 
+# prediction of the model grows as well.
 
 ## e) What happens if you change the variance of the error term? (specify the numbers you tried out!)
 
+# Try the following distributions of the error term - with the smaller/bigger
+# sd and similar mean:
+error1 <- rnorm(n, 0, 2)
+error2 <- rnorm(n, 0, 16)
+
+# Run the code above for the specified errors
+n        <- 200 
+predA    <- c(rep(1,n/2),rep(0,n/2))
+predB    <- rnorm(n, 3, 2)
+interact <- 0.4*(predA*predB)
+resp1    <- 12 + 4.3*predA - 2.8*predB + interact + error1
+resp2    <- 12 + 4.3*predA - 2.8*predB + interact + error2
+d1       <- data.frame(predA, predB, resp1)
+d2       <- data.frame(predA, predB, resp2)
+
+m1 <- lm(resp1~predA*predB, data=d1)
+m2 <- lm(resp2~predA*predB, data=d2)
+
+summary(m1)
+summary(m2)
+
+# The modification of the error term respectively increases/descreases the spread 
+# of the error variability in the specified distribution for the intercept,
+# predictors and their interaction. The higher deviation of the error means
+# the higher error of the model's prediction and vice versa.
+
 ## f) What happens if you change the effect sizes? (specify the numbers you tried out!)
 
+effectA1 <- 2
+effectA2 <- 8
+effectB1 <- 1
+effectB2 <- 5
+
+# Run the code as above to monitor the changes
+
+################## THIS RANDOMLY STARTED ERRORING OUT, NOT SURE WHY
+
+n        <- 200 
+predA    <- c(rep(1,n/2),rep(0,n/2))
+predB    <- rnorm(n, 3, 2)
+interact <- 0.4*(predA*predB)
+
+respA1    <- 12 + effectA1*predA - 2.8*predB + interact + error
+respA2    <- 12 + effectA2*predA - 2.8*predB + interact + error
+respB1    <- 12 + 4.3*predA - effectB1*predB + interact + error
+respB2    <- 12 + 4.3*predA - effectB2*predB + interact + error
+respA1B1  <- 12 + effectA1*predA - effectB1*predB + interact + error
+
+dA1       <- data.frame(predA, predB, respA1)
+dA2       <- data.frame(predA, predB, respA2)
+dB1       <- data.frame(predA, predB, respA2)
+dB2       <- data.frame(predA, predB, respA2)
+dA1B1     <- data.frame(predA, predB, respA1B1)
+
+m1 <- lm(respA1~predA*predB, data=dA1)
+m2 <- lm(respA2~predA*predB, data=dA2)
+m3 <- lm(respB1~predA*predB, data=dB1)
+m4 <- lm(respB2~predA*predB, data=dB2)
+m5 <- lm(respA1B1~predA*predB, data=dA1B1)
+
+summary(m1)
+summary(m2)
+summary(m3)
+summary(m4)
+summary(m5)
+
+# From the effect size's changes, we can see that 
+# an increase in the effect size increases the relationship
+# between the predictor variable and the outcome variable and vice
+# versa. It also influences the variability of the interaction term
+# of the predictors, making one predictor or another more or less prominent
+# based on the bigger or smaller effect size.
 
 ## Next we include the above code into a loop to calculate the power of the experiment 
 ## number of simulated data sets
@@ -158,9 +255,32 @@ for(i in c(1:sim)){
 ##    Calculate the power based on the simulations for all three effects of interest 
 ##    (i.e., predA, predB and the interaction) individually.
 
+power_predA1 <- mean(results[, "predA"] < 0.05)
+power_predB1 <- mean(results[, "predB"] < 0.05)
+power_interaction1 <- mean(results[, "interaction"] < 0.05)
+
+print(power_predA1)
+print(power_predB1)
+print(power_interaction1)
+
 ## h) How does power change when you decrease your alpha level to 0.01?
 
+power_predA2 <- mean(results[, "predA"] < 0.01)
+power_predB2 <- mean(results[, "predB"] < 0.01)
+power_interaction2 <- mean(results[, "interaction"] < 0.01)
+
+print(power_predA2)
+print(power_predB2)
+print(power_interaction2)
+
+# With the decrease of alpha to 0.01, the power changes for the predA and
+# the interaction, becoming less. The power for the predB stays the same and is
+# equal to 1.
+
 ## i) Why do you think power is higher for predB compared to predA?
+
+# Even though the effect size of predB is less, it is the case that the variance of
+# predB is also lower, so the power for predB is actually higher.
 
 ## j) Let's do a power calculation: Given the effect sizes from above, find the minimal sample size n 
 ##  for which:
@@ -168,3 +288,35 @@ for(i in c(1:sim)){
 ##    b. we have 95% power to find an effect of predB
 ##  You can use the code from above and try out different values, or include it in another loop to test
 ##  multiple sample sizes simultaneously
+
+# Initialize all the necessary variables for the calculation
+power_predA <- 0.8
+power_predB <- 0.95
+n <- 360
+
+for(i in c(1:sim)){
+      predA    <- c(rep(1,n/2),rep(0,n/2))
+      predB    <- rnorm(n, 3, 2)
+      interact <- 0.4*(predA*predB)
+      error    <- rnorm(n, 0, 8)
+      resp     <- 12 + 4.3*predA - 2.8*predB + interact + error
+      d        <- data.frame(predA, predB, resp)
+      m1       <- lm(resp~predA*predB, data=d)
+      
+      results[i,] = summary(m1)$coefficients[,4]
+  }
+  
+power_A <- mean(results[, "predA"] < 0.05)
+power_B <- mean(results[, "predB"] < 0.05)
+  
+if (power_A >= power_predA) {
+    print(power_A) 
+}
+  
+if (power_B >= power_predB) {
+    print(power_B)
+}
+
+# At around n=360 (different for different trials), power of A and power of B
+# seem to both stabilize and be above the desired values of 0.8 and 0.95.
+
