@@ -188,12 +188,11 @@ effectB2 <- 5
 
 # Run the code as above to monitor the changes
 
-################## THIS RANDOMLY STARTED ERRORING OUT, NOT SURE WHY
-
 n        <- 200 
 predA    <- c(rep(1,n/2),rep(0,n/2))
 predB    <- rnorm(n, 3, 2)
 interact <- 0.4*(predA*predB)
+error    <- rnorm(n, 0, 8)
 
 respA1    <- 12 + effectA1*predA - 2.8*predB + interact + error
 respA2    <- 12 + effectA2*predA - 2.8*predB + interact + error
